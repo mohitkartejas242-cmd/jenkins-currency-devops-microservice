@@ -1,14 +1,75 @@
-node {
-	stage('Build') {
-		echo "Build"
+// Scripted Pipeline
+// node {
+// 	stage('Build') {
+// 		echo "Build"
+// 	}
+// 	stage('Test') {
+// 		echo "Test"
+// 	}
+// 	stage('Integration Test') {
+// 		echo "Integration Test"
+// 	}
+// 	stage('Deploying') {
+// 		echo "Deploying"
+// 	}
+// }
+// node{
+// 	echo "Build"
+// 	echo "Test"
+// }
+
+// Declarative Pipeline
+Pipeline{
+	agent any
+
+	options{
+		retry(3)
+		timeout(time:1, unit:'MINUTES')
+		timestamps()
 	}
-	stage('Test') {
-		echo "Test"
+
+	stages{
+		stage('Build'){
+			steps{
+				echo "Build"
+			}
+		}
+		stage('Test'){
+			steps{
+				echo "Test"
+			}
+		}
+		stage('Integration Test'){
+			steps{
+				echo "Integration Test"
+			}
+		}
+		stage('Deploying'){
+			steps{
+				echo "Deploying"
+			}
+		}
 	}
-	stage('Integration Test') {
-		echo "Integration Test"
-	}
-	stage('Deploying') {
-		echo "Deploying"
+	post{
+		always{
+			echo "This will always execute"
+		}
+		success{
+			echo "This will execute on success"
+		}
+		failure{
+			echo "This will execute on failure"
+		}
+		changed{
+			echo "This will execute on changed status"
+		}
+		unstable{
+			echo "This will execute on unstable"
+		}
 	}
 }
+
+
+
+
+
