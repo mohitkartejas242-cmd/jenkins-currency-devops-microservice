@@ -90,22 +90,41 @@
 
 
 // Variables and environment
-pipeline{
-	agent any
+// pipeline{
+// 	agent any
 
-	stages{
-		stage('Build'){
-			steps{
-				echo "Building the application in ${env.BRANCH_NAME} branch"
-				echo 'buildNumber: ${env.BUILD_NUMBER}'
-				echo 'env.Build_ID'
-				echo "env.WORKSPACE: ${env.WORKSPACE}"
-				echo "env.JOB_NAME: ${env.JOB_NAME}"
-				echo "env.BUILD_URL: ${env.BUILD_URL}"
-				echo "env.BUILD_TAG: ${env.BUILD_TAG}"
-			}
-		}
-	}
+// 	stages{
+// 		stage('Build'){
+// 			steps{
+// 				echo "Building the application in ${env.BRANCH_NAME} branch"
+// 				echo 'buildNumber: ${env.BUILD_NUMBER}'
+// 				echo 'env.Build_ID'
+// 				echo "env.WORKSPACE: ${env.WORKSPACE}"
+// 				echo "env.JOB_NAME: ${env.JOB_NAME}"
+// 				echo "env.BUILD_URL: ${env.BUILD_URL}"
+// 				echo "env.BUILD_TAG: ${env.BUILD_TAG}"
+// 			}
+// 		}
+// 	}
+// }
+
+// Docker and maven
+pipeline{
+    environment{
+        dockerHome = tool 'myDocker'
+        mavenHome = tool 'myMaven'
+        PATH = "${env.dockerHome}/bin:${env.mavenHome}/bin:${env.PATH}"
+    }
+    agent any
+
+    stages{
+        stage('build'){
+            steps{
+                sh 'docker --version'
+                sh 'mvn --version'
+            }
+        }
+    }
 }
 
 
