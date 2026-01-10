@@ -19,56 +19,74 @@
 // }
 
 // Declarative Pipeline
-Pipeline{
-	agent any
+// Pipeline{
+// 	agent any
 
-	options{
-		retry(3)
-		timeout(time:1, unit:'MINUTES')
-		timestamps()
+// 	options{
+// 		retry(3)
+// 		timeout(time:1, unit:'MINUTES')
+// 		timestamps()
+// 	}
+
+// 	stages{
+// 		stage('Build'){
+// 			steps{
+// 				echo "Build"
+// 			}
+// 		}
+// 		stage('Test'){
+// 			steps{
+// 				echo "Test"
+// 			}
+// 		}
+// 		stage('Integration Test'){
+// 			steps{
+// 				echo "Integration Test"
+// 			}
+// 		}
+// 		stage('Deploying'){
+// 			steps{
+// 				echo "Deploying"
+// 			}
+// 		}
+// 	}
+// 	post{
+// 		always{
+// 			echo "This will always execute"
+// 		}
+// 		success{
+// 			echo "This will execute on success"
+// 		}
+// 		failure{
+// 			echo "This will execute on failure"
+// 		}
+// 		changed{
+// 			echo "This will execute on changed status"
+// 		}
+// 		unstable{
+// 			echo "This will execute on unstable"
+// 		}
+// 	}
+// }
+
+
+// Docker agent
+pipeline{
+	agent{
+		docker{
+			image 'maven:3.8.1-jdk-11'
+			args '-v /root/.m2:/root/.m2'
+		}
 	}
 
 	stages{
-		stage('Build'){
+		stage('build'){
 			steps{
-				echo "Build"
+				sh 'mvn --version'
 			}
-		}
-		stage('Test'){
-			steps{
-				echo "Test"
-			}
-		}
-		stage('Integration Test'){
-			steps{
-				echo "Integration Test"
-			}
-		}
-		stage('Deploying'){
-			steps{
-				echo "Deploying"
-			}
-		}
-	}
-	post{
-		always{
-			echo "This will always execute"
-		}
-		success{
-			echo "This will execute on success"
-		}
-		failure{
-			echo "This will execute on failure"
-		}
-		changed{
-			echo "This will execute on changed status"
-		}
-		unstable{
-			echo "This will execute on unstable"
 		}
 	}
 }
-
 
 
 
