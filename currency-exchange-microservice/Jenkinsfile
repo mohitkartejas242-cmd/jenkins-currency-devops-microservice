@@ -153,7 +153,10 @@ pipeline{
                 stage('unit test'){
                     steps{
                         echo "Starting Unit Tests..."
-                        sh 'mvn test'
+                        // Change into the folder where pom.xml exists
+                            dir('currency-exchange-microservice') {
+                            sh 'mvn clean compile'
+                        }
                     }
                 }
                 stage('integration test'){
