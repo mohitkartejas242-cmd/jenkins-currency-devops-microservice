@@ -128,6 +128,52 @@
 // }
 
 // run unit tests and integration tests in parallel
+// pipeline{
+//     environment{
+//         dockerHome = tool 'myDocker'
+//         mavenHome = tool 'myMaven'
+//         PATH = "${env.dockerHome}/bin:${env.mavenHome}/bin:${env.PATH}"
+//     }
+//     agent any
+
+//     stages{
+//         stage('checking version'){
+//             steps{
+//                 sh 'docker --version'
+//                 sh 'mvn --version'
+//             }
+//         }
+//         stage('compile'){
+//             steps{
+//                 dir('currency-exchange-microservice') {
+//                     sh 'mvn clean compile'
+//                 }
+//             }
+//         }
+//         stage('test'){
+//             parallel{
+//                 stage('unit test'){
+//                     steps{
+//                         echo "Starting Unit Tests..."
+//                         // Change into the folder where pom.xml exists
+//                             dir('currency-exchange-microservice') {
+//                             sh 'mvn clean compile'
+//                         }
+//                     }
+//                 }
+//                 stage('integration test'){
+//                     steps{
+//                         // sh 'mvn verify -DskipUnitTests=true'
+//                         echo "Integration tests executed"
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
+// build docker image
 pipeline{
     environment{
         dockerHome = tool 'myDocker'
@@ -137,12 +183,6 @@ pipeline{
     agent any
 
     stages{
-        stage('checking version'){
-            steps{
-                sh 'docker --version'
-                sh 'mvn --version'
-            }
-        }
         stage('compile'){
             steps{
                 dir('currency-exchange-microservice') {
@@ -150,21 +190,25 @@ pipeline{
                 }
             }
         }
-        stage('test'){
-            parallel{
-                stage('unit test'){
-                    steps{
-                        echo "Starting Unit Tests..."
-                        // Change into the folder where pom.xml exists
-                            dir('currency-exchange-microservice') {
-                            sh 'mvn clean compile'
-                        }
-                    }
+        stage('build docker image'){
+            steps{
+                // "docker build -t in28min/currency-exchange-devops:${env.BUILD_TAG}"
+                script{
+                    dockerImnage = docker.build("tejas002/currency-exchange-devops:${env.BUILD_TAG}")
                 }
-                stage('integration test'){
-                    steps{
-                        // sh 'mvn verify -DskipUnitTests=true'
-                        echo "Integration tests executed"
+            }
+        }
+        stage('package jar'){
+            steps{
+                sh 'mvn clean -DskipTests'
+            }
+        }
+        stage('push docker image'){
+            steps{
+                script{
+                    docker.withRegistry('', 'dockerhub')  {
+                        dockerImage.push()
+                        dockerImage.push('latest')
                     }
                 }
             }
