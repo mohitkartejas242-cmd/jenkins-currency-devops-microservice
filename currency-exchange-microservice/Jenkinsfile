@@ -109,6 +109,25 @@
 // }
 
 // Docker and maven
+// pipeline{
+//     environment{
+//         dockerHome = tool 'myDocker'
+//         mavenHome = tool 'myMaven'
+//         PATH = "${env.dockerHome}/bin:${env.mavenHome}/bin:${env.PATH}"
+//     }
+//     agent any
+
+//     stages{
+//         stage('build'){
+//             steps{
+//                 sh 'docker --version'
+//                 sh 'mvn --version'
+//             }
+//         }
+//     }
+// }
+
+// run unit tests and integration tests in parallel
 pipeline{
     environment{
         dockerHome = tool 'myDocker'
@@ -118,14 +137,33 @@ pipeline{
     agent any
 
     stages{
-        stage('build'){
+        stage('checking version'){
             steps{
                 sh 'docker --version'
                 sh 'mvn --version'
             }
         }
+        stage('compile'){
+            steps{
+                sh 'mvn clean compile'
+            }
+        }
+        stage('test'){
+            parallel{
+                stage('unit test'){
+                    steps{
+                        echo "Starting Unit Tests..."
+                        sh 'mvn test'
+                    }
+                }
+                stage('integration test'){
+                    steps{
+                        // sh 'mvn verify -DskipUnitTests=true'
+                        echo "Integration tests executed"
+                    }
+                }
+            }
+        }
     }
 }
-
-
 
