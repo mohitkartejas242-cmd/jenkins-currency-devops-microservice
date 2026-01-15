@@ -174,45 +174,97 @@
 
 
 // build docker image
-pipeline{
-    environment{
-        dockerHome = tool 'myDocker'
-        mavenHome = tool 'myMaven'
-        PATH = "${env.dockerHome}/bin:${env.mavenHome}/bin:${env.PATH}"
-    }
-    agent any
+// pipeline{
+//     environment{
+//         dockerHome = tool 'myDocker'
+//         mavenHome = tool 'myMaven'
+//         PATH = "${env.dockerHome}/bin:${env.mavenHome}/bin:${env.PATH}"
+//     }
+//     agent any
 
-    stages{
-        stage('compile'){
-            steps{
-                dir('currency-exchange-microservice') {
-                    sh 'mvn clean compile'
-                }
-            }
-        }
-        stage('build docker image'){
-            steps{
-                // "docker build -t in28min/currency-exchange-devops:${env.BUILD_TAG}"
-                script{
-                    dockerImnage = docker.build("tejas002/currency-exchange-devops:${env.BUILD_TAG}")
-                }
-            }
-        }
-        stage('package jar'){
-            steps{
-                sh 'mvn clean -DskipTests'
-            }
-        }
-        stage('push docker image'){
-            steps{
-                script{
-                    docker.withRegistry('', 'dockerhub')  {
-                        dockerImage.push()
-                        dockerImage.push('latest')
-                    }
-                }
-            }
-        }
-    }
+//     stages{
+//         stage('compile'){
+//             steps{
+//                 dir('currency-exchange-microservice') {
+//                     sh 'mvn clean compile'
+//                 }
+//             }
+//         }
+//         stage('build docker image'){
+//             steps{
+//                 // "docker build -t in28min/currency-exchange-devops:${env.BUILD_TAG}"
+//                 script{
+//                     dockerImnage = docker.build("tejas002/currency-exchange-devops:${env.BUILD_TAG}")
+//                 }
+//             }
+//         }
+//         stage('package jar'){
+//             steps{
+//                 sh 'mvn clean -DskipTests'
+//             }
+//         }
+//         stage('push docker image'){
+//             steps{
+//                 script{
+//                     docker.withRegistry('', 'dockerhub')  {
+//                         dockerImage.push()
+//                         dockerImage.push('latest')
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
+// simple delete it after
+pipeline{
+	agent any
+
+	options{
+		retry(3)
+		timeout(time:1, unit:'MINUTES')
+		timestamps()
+	}
+
+	stages{
+		stage('Build'){
+			steps{
+				echo "Build"
+			}
+		}
+		stage('Test'){
+			steps{
+				echo "Test"
+			}
+		}
+		stage('Integration Test'){
+			steps{
+				echo "Integration Test"
+			}
+		}
+		stage('Deploying'){
+			steps{
+				echo "Deploying"
+			}
+		}
+	}
+	post{
+		always{
+			echo "This will always execute"
+		}
+		success{
+			echo "This will execute on success"
+		}
+		failure{
+			echo "This will execute on failure"
+		}
+		changed{
+			echo "This will execute on changed status"
+		}
+		unstable{
+			echo "This will execute on unstable"
+		}
+	}
 }
 
